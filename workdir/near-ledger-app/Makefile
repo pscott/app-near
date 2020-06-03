@@ -31,7 +31,8 @@ APPVERSION = $(APPVERSION_M).$(APPVERSION_N).$(APPVERSION_P)
 ICONNAME = near_icon.gif
 
 APP_LOAD_PARAMS = --appFlags 0x40 --path "44'/397'" --curve secp256k1 --curve ed25519 $(COMMON_LOAD_PARAMS)
-
+# First version of app, addd "Pending Security review" flag"
+APP_LOAD_PARAMS += --tlvraw 9F:01
 # Build configuration
 
 ### variables processed by the common makefile.rules of the SDK to grab source files and include dirs
@@ -110,4 +111,4 @@ include $(BOLOS_SDK)/Makefile.rules
 
 
 listvariants:
-	@echo VARIANTS COIN waves
+	@echo VARIANTS COIN near
