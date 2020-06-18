@@ -15,14 +15,14 @@ Based on https://github.com/ZondaX/ledger-docker-bolos (MIT license) and https:/
 3. Link `BOLOS_SDK` env variable to the folder that you just copied. For instance, if this repo is in your $HOME dir, you would use:
   
   ```bash
-  export BOLOS_SDK=$HOME/near-ledger-app/workdir/nanos-secure-sdk
+  export BOLOS_SDK=$HOME/app-near/workdir/nanos-secure-sdk
   ```
 
 4. Run `./build.sh`. You may have to log into Docker.
 5. `./run.sh` – this starts shell in Docker.
-6. `cd` into `workdir/near-ledger-app` (in Docker) 
+6. `cd` into `workdir/app-near` (in Docker) 
 7. Run `make` (in Docker).
-8. `cd` into `workdir/near-ledger-app` (in local env) 
+8. `cd` into `workdir/app-near` (in local env) 
 9. Create virtual environment to use python3 and install dependencies (install `pip` - install it via `brew`):
 
 ```bash

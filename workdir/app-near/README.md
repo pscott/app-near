@@ -1,4 +1,4 @@
-# near-ledger-app
+# app-near
 
 NEAR wallet application for Ledger Nano S
 
