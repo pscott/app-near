@@ -1,6 +1,6 @@
 #*******************************************************************************
-#   Ledger Blue
-#   (c) 2016 Ledger
+#   Ledger App
+#   (c) 2017 Ledger
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -16,54 +16,89 @@
 #*******************************************************************************
 
 ifeq ($(BOLOS_SDK),)
-$(error BOLOS_SDK is not set)
+$(error Environment variable BOLOS_SDK is not set)
 endif
 include $(BOLOS_SDK)/Makefile.defines
 
-# Main app configuration
+APP_LOAD_PARAMS= --curve ed25519 --path "44'/397'" --appFlags 0x240 $(COMMON_LOAD_PARAMS)
 
 APPVERSION_M=1
 APPVERSION_N=0
 APPVERSION_P=1
-
 APPNAME = "NEAR"
 APPVERSION = $(APPVERSION_M).$(APPVERSION_N).$(APPVERSION_P)
-ICONNAME = near_icon.gif
 
-APP_LOAD_PARAMS = --appFlags 0x40 --path "44'/397'" --curve secp256k1 --curve ed25519 $(COMMON_LOAD_PARAMS)
-# First version of app, addd "Pending Security review" flag"
-APP_LOAD_PARAMS += --tlvraw 9F:01
-# Build configuration
+DEFINES += $(DEFINES_LIB)
 
-### variables processed by the common makefile.rules of the SDK to grab source files and include dirs
-APP_SOURCE_PATH  += src
-SDK_SOURCE_PATH  += lib_stusb #qrcode
-#use the SDK U2F+HIDGEN USB profile
-SDK_SOURCE_PATH  += lib_u2f lib_stusb_impl
 
-DEFINES += APPVERSION=\"$(APPVERSION)\"
+ifeq ($(TARGET_NAME),TARGET_NANOX)
+	ICONNAME=icons/nanox_app_boilerplate.gif
+else
+	ICONNAME=near_icon.gif
+endif
 
-#for debug only
-#DEFINES   += HAVE_PRINTF PRINTF=screen_printf
-#DEFINES   += HAVE_PRINTF PRINTF=qemu_printf
-DEFINES += HAVE_SPRINTF PRINTF\(...\)=
-DEFINES += OS_IO_SEPROXYHAL IO_SEPROXYHAL_BUFFER_SIZE_B=128 HAVE_BAGL
-DEFINES += HAVE_IO_USB HAVE_L4_USBLIB IO_USB_MAX_ENDPOINTS=7 IO_HID_EP_LENGTH=64 HAVE_USB_APDU TCS_LOADER_PATCH_VERSION=0
-DEFINES += LEDGER_MAJOR_VERSION=$(APPVERSION_M) LEDGER_MINOR_VERSION=$(APPVERSION_N) LEDGER_PATCH_VERSION=$(APPVERSION_P)
 
-DEFINES += BLAKE_SDK
+################
+# Default rule #
+################
+all: default
 
-# U2F Support
-DEFINES   += HAVE_U2F
-DEFINES   += HAVE_IO_U2F U2F_PROXY_MAGIC=\"NEAR\"
+############
+# Platform #
+############
+
+DEFINES   += OS_IO_SEPROXYHAL
+DEFINES   += HAVE_BAGL HAVE_SPRINTF
+DEFINES   += HAVE_IO_USB HAVE_L4_USBLIB IO_USB_MAX_ENDPOINTS=6 IO_HID_EP_LENGTH=64 HAVE_USB_APDU
+DEFINES   += LEDGER_MAJOR_VERSION=$(APPVERSION_M) LEDGER_MINOR_VERSION=$(APPVERSION_N) LEDGER_PATCH_VERSION=$(APPVERSION_P)
+
+# U2F
+DEFINES   += HAVE_U2F HAVE_IO_U2F
+DEFINES   += U2F_PROXY_MAGIC=\"NEAR\"
 DEFINES   += USB_SEGMENT_SIZE=64
+DEFINES   += BLE_SEGMENT_SIZE=32 #max MTU, min 20
+
+WEBUSB_URL     = wallet.near.org
+DEFINES       += HAVE_WEBUSB WEBUSB_URL_SIZE_B=$(shell echo -n $(WEBUSB_URL) | wc -c) WEBUSB_URL=$(shell echo -n $(WEBUSB_URL) | sed -e "s/./\\\'\0\\\',/g")
 
 DEFINES   += UNUSED\(x\)=\(void\)x
 DEFINES   += APPVERSION=\"$(APPVERSION)\"
-DEFINES   += MAX_DATA_SIZE=650
 
-# Compiler, assembler, and linker
 
+ifeq ($(TARGET_NAME),TARGET_NANOX)
+DEFINES   	  += IO_SEPROXYHAL_BUFFER_SIZE_B=300
+DEFINES       += HAVE_BLE BLE_COMMAND_TIMEOUT_MS=2000
+DEFINES       += HAVE_BLE_APDU # basic ledger apdu transport over BLE
+
+DEFINES       += HAVE_GLO096
+DEFINES       += HAVE_BAGL BAGL_WIDTH=128 BAGL_HEIGHT=64
+DEFINES       += HAVE_BAGL_ELLIPSIS # long label truncation feature
+DEFINES       += HAVE_BAGL_FONT_OPEN_SANS_REGULAR_11PX
+DEFINES       += HAVE_BAGL_FONT_OPEN_SANS_EXTRABOLD_11PX
+DEFINES       += HAVE_BAGL_FONT_OPEN_SANS_LIGHT_16PX
+else
+DEFINES   	  += IO_SEPROXYHAL_BUFFER_SIZE_B=128
+endif
+
+# Both nano S and X benefit from the flow.
+DEFINES       += HAVE_UX_FLOW
+
+# Enabling debug PRINTF
+DEBUG = 0
+ifneq ($(DEBUG),0)
+
+        ifeq ($(TARGET_NAME),TARGET_NANOX)
+                DEFINES   += HAVE_PRINTF PRINTF=mcu_usb_printf
+        else
+                DEFINES   += HAVE_PRINTF PRINTF=screen_printf
+        endif
+else
+        DEFINES   += PRINTF\(...\)=
+endif
+
+##############
+#  Compiler  #
+##############
 ifneq ($(BOLOS_ENV),)
 $(info BOLOS_ENV=$(BOLOS_ENV))
 CLANGPATH := $(BOLOS_ENV)/clang-arm-fropi/bin/
@@ -78,36 +113,54 @@ ifeq ($(GCCPATH),)
 $(info GCCPATH is not set: arm-none-eabi-* will be used from PATH)
 endif
 
-CC := $(CLANGPATH)clang
-CFLAGS += -O3 -Os
+CC       := $(CLANGPATH)clang
 
-AS := $(GCCPATH)arm-none-eabi-gcc
-AFLAGS +=
+#CFLAGS   += -O0
+CFLAGS   += -O3 -Os
 
-LD := $(GCCPATH)arm-none-eabi-gcc
-LDFLAGS += -O3 -Os
-LDLIBS += -lm -lgcc -lc
+AS     := $(GCCPATH)arm-none-eabi-gcc
 
-# Main rules
+LD       := $(GCCPATH)arm-none-eabi-gcc
+LDFLAGS  += -O3 -Os
+LDLIBS   += -lm -lgcc -lc
 
-all: default
+# import rules to compile glyphs(/pone)
+include $(BOLOS_SDK)/Makefile.glyphs
+
+### variables processed by the common makefile.rules of the SDK to grab source files and include dirs
+APP_SOURCE_PATH  += src
+SDK_SOURCE_PATH  += lib_stusb lib_stusb_impl lib_u2f
+
+ifeq ($(TARGET_NAME),TARGET_NANOX)
+SDK_SOURCE_PATH  += lib_blewbxx lib_blewbxx_impl
+SDK_SOURCE_PATH  += lib_ux
+endif
 
 load: all
 	python -m ledgerblue.loadApp $(APP_LOAD_PARAMS)
 
-load-only: 
+load-only:
 	python -m ledgerblue.loadApp $(APP_LOAD_PARAMS)
+
+load-offline: all
+	python -m ledgerblue.loadApp $(APP_LOAD_PARAMS) --offline
 
 delete:
 	python -m ledgerblue.deleteApp $(COMMON_DELETE_PARAMS)
 
-# Import rules to build glyphs
-# NOTE: src/glyphs.* should be removed to recompile it. Or just use 'clean'.
-include $(BOLOS_SDK)/Makefile.glyphs
+release: all
+	export APP_LOAD_PARAMS_EVALUATED="$(shell printf '\\"%s\\" ' $(APP_LOAD_PARAMS))"; \
+	cat load-template.sh | envsubst > load.sh
+	chmod +x load.sh
+	tar -zcf near-ledger-app-$(APPVERSION).tar.gz load.sh bin/app.hex
+	rm load.sh
 
-# Import generic rules from the SDK
-
+# import generic rules from the sdk
 include $(BOLOS_SDK)/Makefile.rules
+
+#add dependency on custom makefile filename
+dep/%.d: %.c Makefile
+
 
 
 listvariants:

@@ -24,6 +24,8 @@
 #include "cx.h"
 #include <stdbool.h>
 
+#define MAX_DATA_SIZE 650
+
 // Host innteration communication protocol
 #define CLA 0x80                // CLASS? 
 #define INS_SIGN 0x02           // Sign Instruction
@@ -51,9 +53,6 @@ typedef struct internal_storage_t {
     uint8_t 			 fido_transport;
     uint8_t 			 initialized;
 } internal_storage_t;
-
-extern WIDE internal_storage_t N_storage_real;
-#define N_storage (*(WIDE internal_storage_t *)PIC(&N_storage_real))
 
 // A place to store information about the transaction
 // for displaying to the user when requesting approval

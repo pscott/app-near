@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "base58.h"
 #include "os.h"
 #include "cx.h"
 

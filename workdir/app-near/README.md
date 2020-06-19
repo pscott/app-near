@@ -1,18 +1,46 @@
-# app-near
+# Ledger boilerplate app
 
-NEAR wallet application for Ledger Nano S
+## Overview
+This is Nano S/X app for NEAR protocol.
 
-# Introduction
+## Building and installing
+To build and install the app on your Ledger Nano S you must set up the Ledger Nano S build environments. Please follow the Getting Started instructions at [here](https://ledger.readthedocs.io/en/latest/userspace/getting_started.html).
 
-This is a Ledger Nano S wallet app for NEAR platform.
+If you don't want to setup a global environnment, you can also setup one just for this app by sourcing `prepare-devenv.sh` with the right target (`s` or `x`).
 
-Thanks to Waves Platform for their [Ledger app](https://github.com/LedgerHQ/ledger-app-waves) serving as a base for this project.
+install prerequisite and switch to a Nano X dev-env:
 
-Special thanks to Jean Passot and Oto from the Ledger team, Jake Bordens from the Ledger/Birst community for their support and advices.
+```bash
+sudo apt install python3-venv python3-dev libudev-dev libusb-1.0-0-dev
 
-# Building
+# (x or s, depending on your device)
+source prepare-devenv.sh x 
+```
 
-You'll need a Ledger Nano S development environment.  More information can be 
-found here: https://github.com/wavesplatform/nanos-app-waves/wiki
+Compile and load the app onto the device:
+```bash
+make load
+```
 
-Note that it's good idea to use Docker config from this repository instead.
+Refresh the repo (required after Makefile edits):
+```bash
+make clean
+```
+
+Remove the app from the device:
+```bash
+make delete
+```
+
+
+## Example of Ledger wallet functionality
+
+Test functionality:
+```bash
+# (x or s, depending on your device)
+source prepare-devenv.sh x
+python test_example.py --account_number 12345
+```
+
+## Documentation
+This follows the specification available in the [`api.asc`](https://github.com/LedgerHQ/app-near/blob/master/doc/api.asc).
