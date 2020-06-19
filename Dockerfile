@@ -19,7 +19,7 @@ RUN pip3 install -U setuptools ledgerblue pillow
 
 RUN adduser -u 1000 test
 
-RUN git clone https://github.com/LedgerHQ/nanos-secure-sdk --branch og-1.6.0-1 /opt/bolos/nanos-secure-sdk
+RUN git clone https://github.com/LedgerHQ/nanos-secure-sdk --branch master /opt/bolos/nanos-secure-sdk
 
 #VOLUME
 RUN echo "export BOLOS_SDK=/opt/bolos/nanos-secure-sdk" >> ~/.bashrc
