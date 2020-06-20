@@ -63,9 +63,7 @@ typedef struct uiContext_t {
 	char line3[45];
 	char line4[45];
 	char line5[45];
-	char line6[45];
-	char line7[45];
-	char line8[45];
+	char amount[45];
 } uiContext_t;
 
 // A place to store data during the signing

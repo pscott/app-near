@@ -143,7 +143,6 @@ void handle_apdu(volatile unsigned int *flags, volatile unsigned int *tx, volati
                     tmp_ctx.signing_context.network_byte = G_io_apdu_buffer[3];
                     add_chunk_data();
                     menu_sign_init();
-                    sign_ux_flow_init();
                     *flags |= IO_ASYNCH_REPLY;
                 } else {
                     add_chunk_data();

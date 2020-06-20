@@ -23,10 +23,7 @@
 #include "../glyphs.h"
 #include "../main.h"
 #include "../globals.h"
-
-#ifdef TARGET_NANOS
-#include "nanos/ui_menus_nanos.h"
-#endif
+#include "../sign_transaction.h"
 
 // UI currently displayed
 enum UI_STATE ui_state;
@@ -278,9 +275,10 @@ void menu_sign_init() {
 
     switch (action_type) {
     case at_transfer: {
-        BORSH_DISPLAY_AMOUNT(amount, ui_context.line1);
+        COPY_LITERAL(ui_context.line1, "transfer");
+        BORSH_DISPLAY_AMOUNT(amount, ui_context.amount);
 
-        // DISPLAY_VERIFY_UI(ui_verify_transfer_nanos, 4, ui_verify_transfer_prepro);
+        sign_transfer_ux_flow_init();
         return;
     }
 
@@ -395,5 +393,5 @@ void menu_sign_init() {
 
     PRINT_REMAINING_BUFFER();
 
-    // DISPLAY_VERIFY_UI(ui_verify_transaction_nanos, 3, ui_verify_transaction_prepro);
+    sign_ux_flow_init();
 }
