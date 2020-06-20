@@ -114,9 +114,8 @@ UX_STEP_NOCB(
     ux_idle_flow_1_step, 
     pnn, 
     {
-      &C_boilerplate_logo,
-      "Boilerplate",
-      "is ready",
+      &C_icon_near,
+      "Use wallet to", "view accounts"
     });
 UX_STEP_VALID(
     ux_idle_flow_2_step,

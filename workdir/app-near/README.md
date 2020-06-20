@@ -1,4 +1,4 @@
-# Ledger boilerplate app
+# NEAR Ledger app
 
 ## Overview
 This is Nano S/X app for NEAR protocol.
