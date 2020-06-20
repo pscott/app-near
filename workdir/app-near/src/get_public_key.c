@@ -1,4 +1,4 @@
-#include "getAddress.h"
+#include "get_public_key.h"
 #include "os.h"
 #include "ux.h"
 #include "utils.h"
@@ -6,7 +6,7 @@
 
 static char address[FULL_ADDRESS_LENGTH];
 
-uint32_t set_result_get_address() {
+uint32_t set_result_get_public_key() {
     os_memmove((char *) G_io_apdu_buffer, (char *) tmp_ctx.address_context.public_key, 32);
     return 32;
 }
@@ -23,7 +23,7 @@ UX_STEP_NOCB(
 UX_STEP_VALID(
     ux_display_public_flow_6_step,
     pb,
-    sendResponse(set_result_get_address(), true),
+    send_response(set_result_get_public_key(), true),
     {
         &C_icon_validate_14,
         "Approve",
@@ -31,7 +31,7 @@ UX_STEP_VALID(
 UX_STEP_VALID(
     ux_display_public_flow_7_step,
     pb,
-    sendResponse(0, false),
+    send_response(0, false),
     {
         &C_icon_crossmark,
         "Reject",
@@ -43,8 +43,8 @@ UX_FLOW(
     &ux_display_public_flow_6_step,
     &ux_display_public_flow_7_step);
 
-void handleGetAddress(uint8_t p1, uint8_t p2, uint8_t *dataBuffer, uint16_t dataLength, volatile unsigned int *flags, volatile unsigned int *tx) {
-    UNUSED(dataLength);
+void handle_get_public_key(uint8_t p1, uint8_t p2, uint8_t *input_buffer, uint16_t input_length, volatile unsigned int *flags, volatile unsigned int *tx) {
+    UNUSED(input_length);
     UNUSED(p2);
 
     init_context();
@@ -53,7 +53,7 @@ void handleGetAddress(uint8_t p1, uint8_t p2, uint8_t *dataBuffer, uint16_t data
     cx_ecfp_public_key_t public_key;
 
     uint32_t path[5];
-    read_path_from_bytes(dataBuffer, path);
+    read_path_from_bytes(input_buffer, path);
 
     if (!get_ed25519_public_key_for_path(path, &public_key))
     {
@@ -65,7 +65,7 @@ void handleGetAddress(uint8_t p1, uint8_t p2, uint8_t *dataBuffer, uint16_t data
     const char prefix[] = "ed25519:";
     os_memset(address, 0, sizeof(address));
     snprintf(address, sizeof(address), prefix);
-    encodeBase58(
+    encode_base58(
         tmp_ctx.address_context.public_key, sizeof(tmp_ctx.address_context.public_key),
         address + sizeof(prefix) - 1, sizeof(address) - sizeof(prefix) + 1);
 

@@ -13,8 +13,8 @@ static const char BASE_58_ALPHABET[] = {'1', '2', '3', '4', '5', '6', '7', '8', 
                                         'h', 'i', 'j', 'k', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
                                         'w', 'x', 'y', 'z'};
 
-unsigned char encodeBase58(unsigned char WIDE *in, unsigned char length,
-                           unsigned char *out, unsigned char maxoutlen) {
+unsigned char encode_base58(char WIDE *in, unsigned char length,
+                           char *out, unsigned char maxoutlen) {
     unsigned char tmp[164];
     unsigned char buffer[164];
     unsigned char j;
@@ -57,12 +57,7 @@ unsigned char encodeBase58(unsigned char WIDE *in, unsigned char length,
     return length;
 }
 
-
-uint32_t readUint32BE(uint8_t *buffer) {
-  return (buffer[0] << 24) | (buffer[1] << 16) | (buffer[2] << 8) | (buffer[3]);
-}
-
-void sendResponse(uint8_t tx, bool approve) {
+void send_response(uint8_t tx, bool approve) {
     G_io_apdu_buffer[tx++] = approve? 0x90 : 0x69;
     G_io_apdu_buffer[tx++] = approve? 0x00 : 0x85;
     // Send back the response, do not restart the event loop

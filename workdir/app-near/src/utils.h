@@ -16,12 +16,10 @@ typedef enum rlpTxType {
 
 unsigned int ui_prepro(const bagl_element_t *element);
 
-uint32_t readUint32BE(uint8_t *buffer);
+unsigned char encode_base58(char WIDE *in, unsigned char length,
+                           char *out, unsigned char maxoutlen);
 
-unsigned char encodeBase58(unsigned char WIDE *in, unsigned char length,
-                           unsigned char *out, unsigned char maxoutlen);
-
-void sendResponse(uint8_t tx, bool approve);
+void send_response(uint8_t tx, bool approve);
 
     // type            userid    x    y   w    h  str rad fill      fg        bg      fid iid  txt   touchparams...       ]
 #define UI_BUTTONS \

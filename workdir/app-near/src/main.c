@@ -20,7 +20,7 @@
 ********************************************************************************/
 
 #include "utils.h"
-#include "getAddress.h"
+#include "get_public_key.h"
 #include "menu.h"
 #include "main.h"
 #include "near.h"
@@ -156,7 +156,7 @@ void handle_apdu(volatile unsigned int *flags, volatile unsigned int *tx, volati
                     THROW(SW_CONDITIONS_NOT_SATISFIED);
                 }
 
-                handleGetAddress(G_io_apdu_buffer[OFFSET_P1], G_io_apdu_buffer[OFFSET_P2], G_io_apdu_buffer + OFFSET_CDATA, G_io_apdu_buffer[OFFSET_LC], flags, tx);
+                handle_get_public_key(G_io_apdu_buffer[OFFSET_P1], G_io_apdu_buffer[OFFSET_P2], G_io_apdu_buffer + OFFSET_CDATA, G_io_apdu_buffer[OFFSET_LC], flags, tx);
             } break;
 
             case INS_GET_APP_CONFIGURATION:
