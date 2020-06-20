@@ -20,7 +20,9 @@
 ********************************************************************************/
 
 #include "utils.h"
+#include "ui.h"
 #include "get_public_key.h"
+#include "sign_transaction.h"
 #include "menu.h"
 #include "main.h"
 #include "near.h"
@@ -59,7 +61,7 @@ void add_chunk_data() {
     // if this is a first chunk
     if (tmp_ctx.signing_context.buffer_used == 0) {
         // then there is the bip32 path in the first chunk - first 20 bytes of data
-        // read_path_from_bytes(&G_io_apdu_buffer[5], (uint32_t *) tmp_ctx.signing_context.bip32);
+        read_path_from_bytes(&G_io_apdu_buffer[5], (uint32_t *) tmp_ctx.signing_context.bip32);
         int path_size = sizeof(tmp_ctx.signing_context.bip32);
 
         // Update the other data from this segment
@@ -127,7 +129,7 @@ void handle_apdu(volatile unsigned int *flags, volatile unsigned int *tx, volati
             PRINTF("command: %d\n", G_io_apdu_buffer[OFFSET_INS]);
             switch (G_io_apdu_buffer[OFFSET_INS]) {
             case INS_SIGN: {
-                if (G_io_apdu_buffer[4] != rx - 5) {
+                if (G_io_apdu_buffer[OFFSET_LC] != rx - 5) {
                     // the length of the APDU should match what's in the 5-byte header.
                     // If not fail.  Don't want to buffer overrun or anything.
                     THROW(SW_CONDITIONS_NOT_SATISFIED);
@@ -140,7 +142,8 @@ void handle_apdu(volatile unsigned int *flags, volatile unsigned int *tx, volati
                 if (G_io_apdu_buffer[2] == P1_LAST) {
                     tmp_ctx.signing_context.network_byte = G_io_apdu_buffer[3];
                     add_chunk_data();
-                    // menu_sign_init();
+                    menu_sign_init();
+                    sign_ux_flow_init();
                     *flags |= IO_ASYNCH_REPLY;
                 } else {
                     add_chunk_data();

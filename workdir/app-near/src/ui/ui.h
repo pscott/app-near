@@ -35,9 +35,6 @@ extern enum UI_STATE ui_state;
 
 void menu_sign_init();
 
-extern int ux_step;
-extern int ux_step_count;
-
 void menu_address_init();
 
 #endif
