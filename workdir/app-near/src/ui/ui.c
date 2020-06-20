@@ -25,32 +25,17 @@
 
 #ifdef TARGET_NANOS
 #include "nanos/ui_menus_nanos.h"
-#include "nanos/ui_menus_buttons.h"
-#include "nanos/ui_menus_prepro.h"
 #endif
-
-ux_state_t ux;
 
 // UI currently displayed
 enum UI_STATE ui_state;
-
-int ux_step, ux_step_count;
 
 
 void menu_address_init() {
     ux_step = 0;
     ux_step_count = 1;
     #if defined(TARGET_NANOS)
-        UX_DISPLAY(ui_address_nanos, ui_address_prepro);
-    #endif // #if TARGET_ID
-}
-
-// Idle state, sow the menu
-void ui_idle() {
-    ux_step = 0; ux_step_count = 0;
-    ui_state = UI_IDLE;
-    #if defined(TARGET_NANOS)
-        UX_MENU_DISPLAY(0, menu_main, NULL);
+        // UX_DISPLAY(ui_address_nanos, ui_address_prepro);
     #endif // #if TARGET_ID
 }
 
@@ -278,7 +263,7 @@ void menu_sign_init() {
 
     if (actions_len != 1) {
         COPY_LITERAL(ui_context.line1, "multiple actions");
-        DISPLAY_VERIFY_UI(ui_verify_transaction_nanos, 3, ui_verify_transaction_prepro);
+        // DISPLAY_VERIFY_UI(ui_verify_transaction_nanos, 3, ui_verify_transaction_prepro);
         return;
     }
 
@@ -294,7 +279,7 @@ void menu_sign_init() {
     case at_transfer: {
         BORSH_DISPLAY_AMOUNT(amount, ui_context.line1);
 
-        DISPLAY_VERIFY_UI(ui_verify_transfer_nanos, 4, ui_verify_transfer_prepro);
+        // DISPLAY_VERIFY_UI(ui_verify_transfer_nanos, 4, ui_verify_transfer_prepro);
         return;
     }
 
@@ -320,7 +305,7 @@ void menu_sign_init() {
         // deposit
         BORSH_DISPLAY_AMOUNT(deposit, ui_context.line5);
 
-        DISPLAY_VERIFY_UI(ui_verify_function_call_nanos, 5, ui_verify_function_call_prepro);
+        // DISPLAY_VERIFY_UI(ui_verify_function_call_nanos, 5, ui_verify_function_call_prepro);
         return;
     }
 
@@ -361,12 +346,12 @@ void menu_sign_init() {
 
             // TODO: read method names array
             // TODO: Need to display one (multiple not supported yet – can just display "multiple methods")
-            DISPLAY_VERIFY_UI(ui_verify_add_function_call_access_key, 4, simple_scroll_prepro);
+            // DISPLAY_VERIFY_UI(ui_verify_add_function_call_access_key, 4, simple_scroll_prepro);
             return;
         } else {
             // full access
 
-            DISPLAY_VERIFY_UI(ui_verify_add_full_access_key, 2, simple_scroll_prepro);
+            // DISPLAY_VERIFY_UI(ui_verify_add_full_access_key, 2, simple_scroll_prepro);
             return;
         }
     }
@@ -409,5 +394,5 @@ void menu_sign_init() {
 
     PRINT_REMAINING_BUFFER();
 
-    DISPLAY_VERIFY_UI(ui_verify_transaction_nanos, 3, ui_verify_transaction_prepro);
+    // DISPLAY_VERIFY_UI(ui_verify_transaction_nanos, 3, ui_verify_transaction_prepro);
 }

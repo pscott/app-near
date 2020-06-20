@@ -2,63 +2,73 @@
 #include "os.h"
 #include "ux.h"
 #include "utils.h"
+#include "main.h"
 
 static char address[FULL_ADDRESS_LENGTH];
 
-static uint8_t set_result_get_address() {
-    uint8_t tx = 0;
-    const uint8_t address_size = strlen(address);
-    G_io_apdu_buffer[tx++] = address_size;
-    os_memmove(G_io_apdu_buffer + tx, address, address_size);
-    tx += address_size;
-    return tx;
+uint32_t set_result_get_address() {
+    os_memmove((char *) G_io_apdu_buffer, (char *) tmp_ctx.address_context.public_key, 32);
+    return 32;
 }
 
 //////////////////////////////////////////////////////////////////////
 
 UX_STEP_NOCB(
-    ux_display_public_flow_5_step, 
-    bnnn_paging, 
+    ux_display_public_flow_5_step,
+    bnnn_paging,
     {
-      .title = "Address",
-      .text = address,
+        .title = "Public Key",
+        .text = address,
     });
 UX_STEP_VALID(
-    ux_display_public_flow_6_step, 
-    pb, 
+    ux_display_public_flow_6_step,
+    pb,
     sendResponse(set_result_get_address(), true),
     {
-      &C_icon_validate_14,
-      "Approve",
+        &C_icon_validate_14,
+        "Approve",
     });
 UX_STEP_VALID(
-    ux_display_public_flow_7_step, 
-    pb, 
+    ux_display_public_flow_7_step,
+    pb,
     sendResponse(0, false),
     {
-      &C_icon_crossmark,
-      "Reject",
+        &C_icon_crossmark,
+        "Reject",
     });
 
-UX_FLOW(ux_display_public_flow,
-  &ux_display_public_flow_5_step,
-  &ux_display_public_flow_6_step,
-  &ux_display_public_flow_7_step
-);
+UX_FLOW(
+    ux_display_public_flow,
+    &ux_display_public_flow_5_step,
+    &ux_display_public_flow_6_step,
+    &ux_display_public_flow_7_step);
 
 void handleGetAddress(uint8_t p1, uint8_t p2, uint8_t *dataBuffer, uint16_t dataLength, volatile unsigned int *flags, volatile unsigned int *tx) {
     UNUSED(dataLength);
     UNUSED(p2);
-    uint8_t publicKey[32];
 
-    getPublicKey(readUint32BE(dataBuffer), publicKey);
-    getAddressStringFromBinary(publicKey, address);
+    init_context();
 
-    if (p1 == P1_NON_CONFIRM) {
-        *tx = set_result_get_address();
-        THROW(0x9000);
-    } else {
-        ux_flow_init(0, ux_display_public_flow, NULL);
-        *flags |= IO_ASYNCH_REPLY;
+    // Get the public key and return it.
+    cx_ecfp_public_key_t public_key;
+
+    uint32_t path[5];
+    read_path_from_bytes(dataBuffer, path);
+
+    if (!get_ed25519_public_key_for_path(path, &public_key))
+    {
+        THROW(INVALID_PARAMETER);
     }
+
+    os_memmove(tmp_ctx.address_context.public_key, public_key.W, 32);
+
+    const char prefix[] = "ed25519:";
+    os_memset(address, 0, sizeof(address));
+    snprintf(address, sizeof(address), prefix);
+    encodeBase58(
+        tmp_ctx.address_context.public_key, sizeof(tmp_ctx.address_context.public_key),
+        address + sizeof(prefix) - 1, sizeof(address) - sizeof(prefix) + 1);
+
+    ux_flow_init(0, ux_display_public_flow, NULL);
+    *flags |= IO_ASYNCH_REPLY;
 }

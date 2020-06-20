@@ -23,6 +23,9 @@
 #include "getAddress.h"
 #include "menu.h"
 #include "main.h"
+#include "near.h"
+#include "crypto/ledger_crypto.h"
+
 // Temporary area to sore stuff and reuse the same memory
 tmpContext_t tmp_ctx;
 uiContext_t ui_context;
@@ -30,13 +33,33 @@ uiContext_t ui_context;
 // SPI Buffer for io_event
 unsigned char G_io_seproxyhal_spi_buffer[IO_SEPROXYHAL_BUFFER_SIZE_B];
 
+uint32_t deserialize_uint32_t(unsigned char *buffer)
+{
+    uint32_t value = 0;
+
+    value |= buffer[0] << 24;
+    value |= buffer[1] << 16;
+    value |= buffer[2] << 8;
+    value |= buffer[3];
+    return value;
+}
+
+// 20 bytes total
+void read_path_from_bytes(unsigned char *buffer, uint32_t *path) {
+    path[0] = deserialize_uint32_t(buffer);
+    path[1] = deserialize_uint32_t(buffer + 4);
+    path[2] = deserialize_uint32_t(buffer + 8);
+    path[3] = deserialize_uint32_t(buffer + 12);
+    path[4] = deserialize_uint32_t(buffer + 16);
+}
+
 // Handle a signing request -- called both from the main apdu loop as well as from
 // the button handler after the user verifies the transaction.
 void add_chunk_data() {
     // if this is a first chunk
     if (tmp_ctx.signing_context.buffer_used == 0) {
         // then there is the bip32 path in the first chunk - first 20 bytes of data
-        read_path_from_bytes(&G_io_apdu_buffer[5], (uint32_t *) tmp_ctx.signing_context.bip32);
+        // read_path_from_bytes(&G_io_apdu_buffer[5], (uint32_t *) tmp_ctx.signing_context.bip32);
         int path_size = sizeof(tmp_ctx.signing_context.bip32);
 
         // Update the other data from this segment
@@ -63,9 +86,6 @@ void add_chunk_data() {
         tmp_ctx.signing_context.buffer_used += data_size;
     }
 }
-#define CLA 0xE0
-#define INS_GET_APP_CONFIGURATION 0x01
-#define INS_GET_ADDR 0x02
 
 // like https://github.com/lenondupe/ledger-app-stellar/blob/master/src/main.c#L1784
 uint32_t set_result_sign() {
@@ -85,11 +105,6 @@ uint32_t set_result_sign() {
     os_memset(&public_key, 0, sizeof(cx_ecfp_public_key_t));
 
     return 64;
-}
-
-uint32_t set_result_get_address() {
-    os_memmove((char *) G_io_apdu_buffer, (char *) tmp_ctx.address_context.public_key, 32);
-    return 32;
 }
 
 #define OFFSET_CLA 0
@@ -125,7 +140,7 @@ void handle_apdu(volatile unsigned int *flags, volatile unsigned int *tx, volati
                 if (G_io_apdu_buffer[2] == P1_LAST) {
                     tmp_ctx.signing_context.network_byte = G_io_apdu_buffer[3];
                     add_chunk_data();
-                    menu_sign_init();
+                    // menu_sign_init();
                     *flags |= IO_ASYNCH_REPLY;
                 } else {
                     add_chunk_data();
@@ -135,47 +150,26 @@ void handle_apdu(volatile unsigned int *flags, volatile unsigned int *tx, volati
             } break;
 
             case INS_GET_PUBLIC_KEY: {
-                if (G_io_apdu_buffer[4] != rx - 5 || G_io_apdu_buffer[4] != 20) {
+                if (G_io_apdu_buffer[OFFSET_LC] != rx - 5 || G_io_apdu_buffer[OFFSET_LC] != 20) {
                     // the length of the APDU should match what's in the 5-byte header.
                     // If not fail.  Don't want to buffer overrun or anything.
                     THROW(SW_CONDITIONS_NOT_SATISFIED);
                 }
 
-                init_context();
-
-                // Get the public key and return it.
-                cx_ecfp_public_key_t public_key;
-
-                uint32_t path[5];
-                read_path_from_bytes(G_io_apdu_buffer + 5, path);
-
-                if (!get_ed25519_public_key_for_path(path, &public_key)) {
-                    THROW(INVALID_PARAMETER);
-                }
-
-                os_memmove((char *) tmp_ctx.address_context.public_key, public_key.W, 32);
-
-                *flags |= IO_ASYNCH_REPLY;
-                menu_address_init();
+                handleGetAddress(G_io_apdu_buffer[OFFSET_P1], G_io_apdu_buffer[OFFSET_P2], G_io_apdu_buffer + OFFSET_CDATA, G_io_apdu_buffer[OFFSET_LC], flags, tx);
             } break;
 
-                case INS_GET_APP_CONFIGURATION:
-                    G_io_apdu_buffer[0] = (N_storage.dummy_setting_1 ? 0x01 : 0x00);
-                    G_io_apdu_buffer[1] = (N_storage.dummy_setting_2 ? 0x01 : 0x00);
-                    G_io_apdu_buffer[2] = LEDGER_MAJOR_VERSION;
-                    G_io_apdu_buffer[3] = LEDGER_MINOR_VERSION;
-                    G_io_apdu_buffer[4] = LEDGER_PATCH_VERSION;
-                    *tx = 4;
-                    THROW(0x9000);
-                    break;
+            case INS_GET_APP_CONFIGURATION:
+                G_io_apdu_buffer[0] = LEDGER_MAJOR_VERSION;
+                G_io_apdu_buffer[1] = LEDGER_MINOR_VERSION;
+                G_io_apdu_buffer[2] = LEDGER_PATCH_VERSION;
+                *tx = 3;
+                THROW(SW_OK);
+                break;
 
-                case INS_GET_ADDR:
-                    handleGetAddress(G_io_apdu_buffer[OFFSET_P1], G_io_apdu_buffer[OFFSET_P2], G_io_apdu_buffer + OFFSET_CDATA, G_io_apdu_buffer[OFFSET_LC], flags, tx);
-                    break;
-
-                default:
-                    THROW(0x6D00);
-                    break;
+            default:
+                THROW(0x6D00);
+                break;
             }
         }
         CATCH(EXCEPTION_IO_RESET) {
@@ -238,9 +232,8 @@ void app_main(void) {
                     THROW(SW_SECURITY_STATUS_NOT_SATISFIED);
                 }
 
-                // Call the Apdu handler,
-                handle_apdu(&flags, &tx, rx);
                 PRINTF("New APDU received:\n%.*H\n", rx, G_io_apdu_buffer);
+                handle_apdu(&flags, &tx, rx);
             }
             CATCH(EXCEPTION_IO_RESET) {
               THROW(EXCEPTION_IO_RESET);
