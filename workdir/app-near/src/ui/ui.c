@@ -212,7 +212,7 @@ void strcpy_ellipsis(size_t dst_size, char *dst, size_t src_size, char *src) {
 #define BORSH_DISPLAY_AMOUNT(var_name, ui_line) \
     char *var_name = &tmp_ctx.signing_context.buffer[processed]; \
     processed += 16; \
-    format_long_decimal_amount(16, var_name, sizeof(ui_context.line1), ui_context.line1, 24);
+    format_long_decimal_amount(16, var_name, sizeof(ui_line), ui_line, 24);
 
 #define DISPLAY_VERIFY_UI(ui, step_count, prepro_fn) \
     ux_step = 0; \
