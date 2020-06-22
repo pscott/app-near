@@ -28,15 +28,6 @@
 // UI currently displayed
 enum UI_STATE ui_state;
 
-
-void menu_address_init() {
-    ux_step = 0;
-    ux_step_count = 1;
-    #if defined(TARGET_NANOS)
-        // UX_DISPLAY(ui_address_nanos, ui_address_prepro);
-    #endif // #if TARGET_ID
-}
-
 /*
  Adapted from https://en.wikipedia.org/wiki/Double_dabble#C_implementation
  Returns: length of resulting string or -1 for error
