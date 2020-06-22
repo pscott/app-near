@@ -211,12 +211,6 @@ void strcpy_ellipsis(size_t dst_size, char *dst, size_t src_size, char *src) {
     processed += 16; \
     format_long_decimal_amount(16, var_name, sizeof(ui_line), ui_line, 24);
 
-#define DISPLAY_VERIFY_UI(ui, step_count, prepro_fn) \
-    ux_step = 0; \
-    ux_step_count = step_count; \
-    ui_state = UI_VERIFY; \
-    UX_DISPLAY(ui, prepro_fn); \
-
 #define COPY_LITERAL(dst, src) \
     os_memmove(dst, src, sizeof(src))
 
@@ -261,7 +255,7 @@ void menu_sign_init() {
 
     if (actions_len != 1) {
         COPY_LITERAL(ui_context.line1, "multiple actions");
-        // DISPLAY_VERIFY_UI(ui_verify_transaction_nanos, 3, ui_verify_transaction_prepro);
+        sign_ux_flow_init();
         return;
     }
 
@@ -304,11 +298,12 @@ void menu_sign_init() {
         // deposit
         BORSH_DISPLAY_AMOUNT(deposit, ui_context.line5);
 
-        // DISPLAY_VERIFY_UI(ui_verify_function_call_nanos, 5, ui_verify_function_call_prepro);
+        sign_function_call_ux_flow_init();
         return;
     }
 
     case at_add_key: {
+        COPY_LITERAL(ui_context.line1, "add key");
         // TODO: Assert that sender/receiver are the same?
 
         // public key
@@ -345,12 +340,12 @@ void menu_sign_init() {
 
             // TODO: read method names array
             // TODO: Need to display one (multiple not supported yet – can just display "multiple methods")
-            // DISPLAY_VERIFY_UI(ui_verify_add_function_call_access_key, 4, simple_scroll_prepro);
+            sign_add_function_call_key_ux_flow_init();
             return;
         } else {
             // full access
 
-            // DISPLAY_VERIFY_UI(ui_verify_add_full_access_key, 2, simple_scroll_prepro);
+            sign_add_full_access_key_ux_flow_init();
             return;
         }
     }
