@@ -142,7 +142,8 @@ UX_STEP_VALID(
     });
 UX_FLOW(ux_idle_flow,
   &ux_idle_flow_1_step,
-  &ux_idle_flow_2_step,
+  // TODO: Re-enable settings once there are any NEAR-specific ones
+  // &ux_idle_flow_2_step,
   &ux_idle_flow_3_step,
   &ux_idle_flow_4_step,
   FLOW_LOOP
