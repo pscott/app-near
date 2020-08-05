@@ -22,37 +22,11 @@
 #include <stdbool.h>
 #include "../glyphs.h"
 #include "../main.h"
-
-#ifdef TARGET_NANOS
-#include "nanos/ui_menus_nanos.h"
-#include "nanos/ui_menus_buttons.h"
-#include "nanos/ui_menus_prepro.h"
-#endif
-
-ux_state_t ux;
+#include "../globals.h"
+#include "../sign_transaction.h"
 
 // UI currently displayed
 enum UI_STATE ui_state;
-
-int ux_step, ux_step_count;
-
-
-void menu_address_init() {
-    ux_step = 0;
-    ux_step_count = 1;
-    #if defined(TARGET_NANOS)
-        UX_DISPLAY(ui_address_nanos, ui_address_prepro);
-    #endif // #if TARGET_ID
-}
-
-// Idle state, sow the menu
-void ui_idle() {
-    ux_step = 0; ux_step_count = 0;
-    ui_state = UI_IDLE;
-    #if defined(TARGET_NANOS)
-        UX_MENU_DISPLAY(0, menu_main, NULL);
-    #endif // #if TARGET_ID
-}
 
 /*
  Adapted from https://en.wikipedia.org/wiki/Double_dabble#C_implementation
@@ -226,13 +200,7 @@ void strcpy_ellipsis(size_t dst_size, char *dst, size_t src_size, char *src) {
 #define BORSH_DISPLAY_AMOUNT(var_name, ui_line) \
     char *var_name = &tmp_ctx.signing_context.buffer[processed]; \
     processed += 16; \
-    format_long_decimal_amount(16, var_name, sizeof(ui_context.line1), ui_context.line1, 24);
-
-#define DISPLAY_VERIFY_UI(ui, step_count, prepro_fn) \
-    ux_step = 0; \
-    ux_step_count = step_count; \
-    ui_state = UI_VERIFY; \
-    UX_DISPLAY(ui, prepro_fn); \
+    format_long_decimal_amount(16, var_name, sizeof(ui_line), ui_line, 24);
 
 #define COPY_LITERAL(dst, src) \
     os_memmove(dst, src, sizeof(src))
@@ -278,7 +246,7 @@ void menu_sign_init() {
 
     if (actions_len != 1) {
         COPY_LITERAL(ui_context.line1, "multiple actions");
-        DISPLAY_VERIFY_UI(ui_verify_transaction_nanos, 3, ui_verify_transaction_prepro);
+        sign_ux_flow_init();
         return;
     }
 
@@ -292,9 +260,10 @@ void menu_sign_init() {
 
     switch (action_type) {
     case at_transfer: {
-        BORSH_DISPLAY_AMOUNT(amount, ui_context.line1);
+        COPY_LITERAL(ui_context.line1, "transfer");
+        BORSH_DISPLAY_AMOUNT(amount, ui_context.amount);
 
-        DISPLAY_VERIFY_UI(ui_verify_transfer_nanos, 4, ui_verify_transfer_prepro);
+        sign_transfer_ux_flow_init();
         return;
     }
 
@@ -320,11 +289,12 @@ void menu_sign_init() {
         // deposit
         BORSH_DISPLAY_AMOUNT(deposit, ui_context.line5);
 
-        DISPLAY_VERIFY_UI(ui_verify_function_call_nanos, 5, ui_verify_function_call_prepro);
+        sign_function_call_ux_flow_init();
         return;
     }
 
     case at_add_key: {
+        COPY_LITERAL(ui_context.line1, "add key");
         // TODO: Assert that sender/receiver are the same?
 
         // public key
@@ -361,12 +331,12 @@ void menu_sign_init() {
 
             // TODO: read method names array
             // TODO: Need to display one (multiple not supported yet – can just display "multiple methods")
-            DISPLAY_VERIFY_UI(ui_verify_add_function_call_access_key, 4, simple_scroll_prepro);
+            sign_add_function_call_key_ux_flow_init();
             return;
         } else {
             // full access
 
-            DISPLAY_VERIFY_UI(ui_verify_add_full_access_key, 2, simple_scroll_prepro);
+            sign_add_full_access_key_ux_flow_init();
             return;
         }
     }
@@ -409,5 +379,5 @@ void menu_sign_init() {
 
     PRINT_REMAINING_BUFFER();
 
-    DISPLAY_VERIFY_UI(ui_verify_transaction_nanos, 3, ui_verify_transaction_prepro);
+    sign_ux_flow_init();
 }
