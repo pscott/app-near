@@ -34,10 +34,6 @@ enum UI_STATE { UI_IDLE, UI_VERIFY };
 extern enum UI_STATE ui_state;
 
 void menu_sign_init();
-void ui_idle();
-
-extern int ux_step;
-extern int ux_step_count;
 
 void menu_address_init();
 

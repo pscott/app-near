@@ -22,37 +22,11 @@
 #include <stdbool.h>
 #include "../glyphs.h"
 #include "../main.h"
-
-#ifdef TARGET_NANOS
-#include "nanos/ui_menus_nanos.h"
-#include "nanos/ui_menus_buttons.h"
-#include "nanos/ui_menus_prepro.h"
-#endif
-
-ux_state_t ux;
+#include "../globals.h"
+#include "../sign_transaction.h"
 
 // UI currently displayed
 enum UI_STATE ui_state;
-
-int ux_step, ux_step_count;
-
-
-void menu_address_init() {
-    ux_step = 0;
-    ux_step_count = 1;
-    #if defined(TARGET_NANOS)
-        UX_DISPLAY(ui_address_nanos, ui_address_prepro);
-    #endif // #if TARGET_ID
-}
-
-// Idle state, sow the menu
-void ui_idle() {
-    ux_step = 0; ux_step_count = 0;
-    ui_state = UI_IDLE;
-    #if defined(TARGET_NANOS)
-        UX_MENU_DISPLAY(0, menu_main, NULL);
-    #endif // #if TARGET_ID
-}
 
 /*
  Adapted from https://en.wikipedia.org/wiki/Double_dabble#C_implementation
@@ -160,7 +134,7 @@ int format_long_decimal_amount(size_t input_size, char *input, size_t output_siz
 
 void check_overflow(unsigned int processed, unsigned int size) {
     PRINTF("check_overflow %d %d %d\n", processed, size, tmp_ctx.signing_context.buffer_used);
-    if (size >= tmp_ctx.signing_context.buffer_used || processed + size >= tmp_ctx.signing_context.buffer_used) {
+    if (size > tmp_ctx.signing_context.buffer_used || processed + size > tmp_ctx.signing_context.buffer_used) {
         THROW(SW_BUFFER_OVERFLOW);
     }
 }
@@ -226,13 +200,7 @@ void strcpy_ellipsis(size_t dst_size, char *dst, size_t src_size, char *src) {
 #define BORSH_DISPLAY_AMOUNT(var_name, ui_line) \
     char *var_name = &tmp_ctx.signing_context.buffer[processed]; \
     processed += 16; \
-    format_long_decimal_amount(16, var_name, sizeof(ui_context.line1), ui_context.line1, 24);
-
-#define DISPLAY_VERIFY_UI(ui, step_count, prepro_fn) \
-    ux_step = 0; \
-    ux_step_count = step_count; \
-    ui_state = UI_VERIFY; \
-    UX_DISPLAY(ui, prepro_fn); \
+    format_long_decimal_amount(16, var_name, sizeof(ui_line), ui_line, 24);
 
 #define COPY_LITERAL(dst, src) \
     os_memmove(dst, src, sizeof(src))
@@ -276,23 +244,30 @@ void menu_sign_init() {
     uint32_t actions_len = borsh_read_uint32(&processed);
     PRINTF("actions_len: %d\n", actions_len);
 
+    if (actions_len != 1) {
+        COPY_LITERAL(ui_context.line1, "multiple actions");
+        sign_ux_flow_init();
+        return;
+    }
+
     // TODO: Parse more than one action
+
     // action type
     uint8_t action_type = borsh_read_uint8(&processed);
     PRINTF("action_type: %d\n", action_type);
 
     // TODO: assert action_type <= at_last_value
 
-    // transfer
-    if (action_type == at_transfer) {
-        BORSH_DISPLAY_AMOUNT(amount, ui_context.line1);
+    switch (action_type) {
+    case at_transfer: {
+        COPY_LITERAL(ui_context.line1, "transfer");
+        BORSH_DISPLAY_AMOUNT(amount, ui_context.amount);
 
-        DISPLAY_VERIFY_UI(ui_verify_transfer_nanos, 4, ui_verify_transfer_prepro);
+        sign_transfer_ux_flow_init();
         return;
     }
 
-    // functionCall
-    if (action_type == at_function_call) {
+    case at_function_call: {
         // method name
         BORSH_DISPLAY_STRING(method_name, ui_context.line1);
 
@@ -314,12 +289,12 @@ void menu_sign_init() {
         // deposit
         BORSH_DISPLAY_AMOUNT(deposit, ui_context.line5);
 
-        DISPLAY_VERIFY_UI(ui_verify_function_call_nanos, 5, ui_verify_function_call_prepro);
+        sign_function_call_ux_flow_init();
         return;
     }
 
-    // add key
-    if (action_type == at_add_key) {
+    case at_add_key: {
+        COPY_LITERAL(ui_context.line1, "add key");
         // TODO: Assert that sender/receiver are the same?
 
         // public key
@@ -356,17 +331,53 @@ void menu_sign_init() {
 
             // TODO: read method names array
             // TODO: Need to display one (multiple not supported yet – can just display "multiple methods")
-            DISPLAY_VERIFY_UI(ui_verify_add_function_call_access_key, 4, simple_scroll_prepro);
+            sign_add_function_call_key_ux_flow_init();
             return;
         } else {
             // full access
 
-            DISPLAY_VERIFY_UI(ui_verify_add_full_access_key, 2, simple_scroll_prepro);
+            sign_add_full_access_key_ux_flow_init();
             return;
         }
     }
 
+    case at_create_account: {
+        COPY_LITERAL(ui_context.line1, "create account");
+        // Use generic UI
+        break;
+    }
+
+    case at_deploy_contract: {
+        COPY_LITERAL(ui_context.line1, "deploy contract");
+        // Use generic UI
+        break;
+    }
+
+    case at_stake: {
+        COPY_LITERAL(ui_context.line1, "stake");
+        // Use generic UI
+        break;
+    }
+
+    case at_delete_key: {
+        COPY_LITERAL(ui_context.line1, "delete key");
+        // Use generic UI
+        break;
+    }
+
+    case at_delete_account: {
+        COPY_LITERAL(ui_context.line1, "delete account");
+        // Use generic UI
+        break;
+    }
+
+    default:
+        // TODO: Throw more specific error?
+        THROW(SW_CONDITIONS_NOT_SATISFIED);
+
+    } // switch
+
     PRINT_REMAINING_BUFFER();
 
-    DISPLAY_VERIFY_UI(ui_verify_transaction_nanos, 3, ui_verify_transaction_prepro);
+    sign_ux_flow_init();
 }

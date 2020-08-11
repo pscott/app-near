@@ -24,6 +24,8 @@
 #include "cx.h"
 #include <stdbool.h>
 
+#define MAX_DATA_SIZE 650
+
 // Host innteration communication protocol
 #define CLA 0x80                // CLASS? 
 #define INS_SIGN 0x02           // Sign Instruction
@@ -52,9 +54,6 @@ typedef struct internal_storage_t {
     uint8_t 			 initialized;
 } internal_storage_t;
 
-extern WIDE internal_storage_t N_storage_real;
-#define N_storage (*(WIDE internal_storage_t *)PIC(&N_storage_real))
-
 // A place to store information about the transaction
 // for displaying to the user when requesting approval
 // 44 for address/id and +1 for \0
@@ -64,9 +63,7 @@ typedef struct uiContext_t {
 	char line3[45];
 	char line4[45];
 	char line5[45];
-	char line6[45];
-	char line7[45];
-	char line8[45];
+	char amount[45];
 } uiContext_t;
 
 // A place to store data during the signing
@@ -80,7 +77,7 @@ typedef struct signingContext_t {
 
 // A place to store data during the confirming the address
 typedef struct addressesContext_t {
-	unsigned char public_key[32];
+	char public_key[32];
 } addressesContext_t;
 
 typedef union {
@@ -92,10 +89,10 @@ extern uiContext_t ui_context;
 
 extern tmpContext_t tmp_ctx; // Temporary area to store stuff
 
+void read_path_from_bytes(unsigned char *buffer, uint32_t *path);
 bool get_ed25519_public_key_for_path(const uint32_t* path, cx_ecfp_public_key_t* public_key);
 
 void init_context();
-uint32_t set_result_get_address();
 uint32_t set_result_sign();
 
 #endif
