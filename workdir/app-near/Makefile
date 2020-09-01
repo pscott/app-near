@@ -24,7 +24,7 @@ APP_LOAD_PARAMS= --curve ed25519 --path "44'/397'" --appFlags 0x240 $(COMMON_LOA
 
 APPVERSION_M=1
 APPVERSION_N=1
-APPVERSION_P=1
+APPVERSION_P=2
 APPNAME = "NEAR"
 APPVERSION = $(APPVERSION_M).$(APPVERSION_N).$(APPVERSION_P)
 
@@ -32,7 +32,7 @@ DEFINES += $(DEFINES_LIB)
 
 
 ifeq ($(TARGET_NAME),TARGET_NANOX)
-	ICONNAME=icons/nanox_app_boilerplate.gif
+	ICONNAME=near_icon_x.gif
 else
 	ICONNAME=near_icon.gif
 endif
