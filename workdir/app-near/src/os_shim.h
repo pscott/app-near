@@ -6,7 +6,7 @@
 #else
     #include <stdlib.h>
     #define THROW(x) do { \
-        printf("THROW(%d)\n", x); \
+        printf("THROW(0x%x)\n", x); \
         exit(1); \
     } while (0);
 
