@@ -56,7 +56,7 @@ static char *test_parse_transfer_2()
     mu_assert("parses action", strcmp(ui_context.line1, "transfer") == 0);
     mu_assert("parses receiver", strcmp(ui_context.line2, "vg") == 0);
     mu_assert("parses signer", strcmp(ui_context.line3, "test-pr-517-ledger.test") == 0);
-    mu_assert("parses amount", strcmp(ui_context.amount, "0.002") == 0);
+    mu_assert("parses amount", strcmp(ui_context.amount, "1") == 0);
     mu_assert("line 4 empty", strcmp(ui_context.line4, "") == 0);
     mu_assert("line 5 empty", strcmp(ui_context.line5, "") == 0);
     mu_assert("uses transfer flow", active_flow == SIGN_FLOW_TRANSFER);
