@@ -123,11 +123,18 @@ int format_long_decimal_amount(size_t input_size, char *input, size_t output_siz
         len = len + 1;
     }
 
-    // Remove trailing zeros and dot
+
+    // Remove trailing zeros
     output[len] = '0';
-    while (len > 0 && (output[len] == '0' || output[len] == '.')) {
+    while (len > 0 && output[len] == '0') {
         output[len--] = 0;
     }
+
+    // Remove trailing dot
+    if (output[len] == '.') {
+        output[len] = 0;
+    }
+
 
     return len;
 }
