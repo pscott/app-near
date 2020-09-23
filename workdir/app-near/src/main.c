@@ -134,21 +134,8 @@ void handle_apdu(volatile unsigned int *flags, volatile unsigned int *tx, volati
                     // If not fail.  Don't want to buffer overrun or anything.
                     THROW(SW_CONDITIONS_NOT_SATISFIED);
                 }
-                if ((G_io_apdu_buffer[2] != P1_MORE) &&
-                    (G_io_apdu_buffer[2] != P1_LAST)) {
-                    THROW(SW_INCORRECT_P1_P2);
-                }
 
-                if (G_io_apdu_buffer[2] == P1_LAST) {
-                    tmp_ctx.signing_context.network_byte = G_io_apdu_buffer[3];
-                    add_chunk_data();
-                    menu_sign_init();
-                    *flags |= IO_ASYNCH_REPLY;
-                } else {
-                    add_chunk_data();
-                    THROW(SW_OK);
-                }
-
+                handle_sign_transaction(G_io_apdu_buffer[OFFSET_P1], G_io_apdu_buffer[OFFSET_P2], G_io_apdu_buffer + OFFSET_CDATA, G_io_apdu_buffer[OFFSET_LC], flags, tx);
             } break;
 
             case INS_GET_PUBLIC_KEY: {

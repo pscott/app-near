@@ -33,8 +33,4 @@ extern ux_state_t ux;
 enum UI_STATE { UI_IDLE, UI_VERIFY };
 extern enum UI_STATE ui_state;
 
-void menu_sign_init();
-
-void menu_address_init();
-
 #endif

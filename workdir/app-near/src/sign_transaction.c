@@ -128,10 +128,38 @@ void handle_sign_transaction(uint8_t p1, uint8_t p2, uint8_t *input_buffer, uint
     UNUSED(input_length);
     UNUSED(p2);
 
-    // TODO: Should clear context on first chunk?
-    // init_context();
+    if (p1 != P1_MORE && p1 != P1_LAST) {
+        THROW(SW_INCORRECT_P1_P2);
+    }
 
-    // TODO: Move handling command here from main.c
-    sign_ux_flow_init();
+    if (p1 == P1_LAST) {
+        // TODO: Is network_byte used anywhere?
+        tmp_ctx.signing_context.network_byte = p2;
+        add_chunk_data();
+
+        switch (parse_transaction()) {
+            case SIGN_FLOW_GENERIC:
+                sign_ux_flow_init();
+                break;
+            case SIGN_FLOW_TRANSFER:
+                sign_transfer_ux_flow_init();
+                break;
+            case SIGN_FLOW_FUNCTION_CALL:
+                sign_function_call_ux_flow_init();
+                break;
+            case SIGN_FLOW_ADD_FUNCTION_CALL_KEY:
+                sign_add_function_call_key_ux_flow_init();
+                break;
+            case SIGN_FLOW_ADD_FULL_ACCESS_KEY:
+                sign_add_function_call_key_ux_flow_init();
+                break;
+            default:
+                THROW(SW_CONDITIONS_NOT_SATISFIED);
+        }
+    } else {
+        add_chunk_data();
+        THROW(SW_OK);
+    }
+
     *flags |= IO_ASYNCH_REPLY;
 }
