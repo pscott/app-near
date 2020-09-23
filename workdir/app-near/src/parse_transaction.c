@@ -5,7 +5,7 @@
 #include "parse_transaction.h"
 
 #include "context.h"
-#include "throw.h"
+#include "os_shim.h"
 
 /*
  Adapted from https://en.wikipedia.org/wiki/Double_dabble#C_implementation
