@@ -44,7 +44,6 @@ UX_FLOW(
     &ux_display_public_flow_7_step);
 
 void handle_get_public_key(uint8_t p1, uint8_t p2, uint8_t *input_buffer, uint16_t input_length, volatile unsigned int *flags, volatile unsigned int *tx) {
-    UNUSED(input_length);
     UNUSED(p2);
 
     init_context();
@@ -53,6 +52,9 @@ void handle_get_public_key(uint8_t p1, uint8_t p2, uint8_t *input_buffer, uint16
     cx_ecfp_public_key_t public_key;
 
     uint32_t path[5];
+    if (input_length < sizeof(path)) {
+        THROW(INVALID_PARAMETER);
+    }
     read_path_from_bytes(input_buffer, path);
 
     if (!get_ed25519_public_key_for_path(path, &public_key))
