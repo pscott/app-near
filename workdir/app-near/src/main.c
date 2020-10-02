@@ -97,14 +97,19 @@ uint32_t set_result_sign() {
 
     public_key_le_to_be(&public_key);
 
-    uint8_t signature[64];
-    near_message_sign(&private_key, public_key.W, (unsigned char *) tmp_ctx.signing_context.buffer, tmp_ctx.signing_context.buffer_used, signature);
+    BEGIN_TRY {
+        TRY {
+            uint8_t signature[64];
+            near_message_sign(&private_key, public_key.W, (unsigned char *)tmp_ctx.signing_context.buffer, tmp_ctx.signing_context.buffer_used, signature);
 
-    os_memmove((char *) G_io_apdu_buffer, signature, sizeof(signature));
-
-    // reset all private stuff
-    os_memset(&private_key, 0, sizeof(cx_ecfp_private_key_t));
-    os_memset(&public_key, 0, sizeof(cx_ecfp_public_key_t));
+            os_memmove((char *)G_io_apdu_buffer, signature, sizeof(signature));
+        } FINALLY {
+            // reset all private stuff
+            os_memset(&private_key, 0, sizeof(cx_ecfp_private_key_t));
+            os_memset(&public_key, 0, sizeof(cx_ecfp_public_key_t));
+        }
+    }
+    END_TRY;
 
     return 64;
 }
@@ -209,7 +214,6 @@ void app_main(void) {
     // APDU injection faults.
     for (;;) {
         volatile unsigned short sw = 0;
-
         BEGIN_TRY {
             TRY {
                 rx = tx;
