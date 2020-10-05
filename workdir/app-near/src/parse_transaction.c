@@ -262,8 +262,9 @@ int parse_transaction() {
         borsh_read_buffer(&args_len, &args, &processed);
         if (args_len > 0 && args[0] == '{') {
             // Args look like JSON
-            strcpy_ellipsis(sizeof(ui_context.line4), ui_context.line4, args_len, args);
-            PRINTF("args: %s\n", ui_context.line4);
+            strcpy_ellipsis(sizeof(ui_context.long_line), ui_context.long_line, args_len, args);
+            // TODO: Make sure destination buffer is big enough
+            PRINTF("args: %s\n", ui_context.long_line);
         } else {
             // TODO: Hexdump args otherwise
         }

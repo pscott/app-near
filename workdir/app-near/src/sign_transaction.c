@@ -20,7 +20,7 @@ INFO_STEP(sign_flow_receiver_step, "To",  ui_context.line2);
 INFO_STEP(sign_flow_signer_step, "From",  ui_context.line3);
 INFO_STEP(sign_flow_amount_step, "Amount",  ui_context.amount);
 INFO_STEP(sign_flow_deposit_step, "Deposit",  ui_context.line5);
-INFO_STEP(sign_flow_args_step, "Args",  ui_context.line4);
+INFO_STEP(sign_flow_args_step, "Args",  ui_context.long_line);
 INFO_STEP(sign_flow_to_account_step, "To Account",  ui_context.line3);
 INFO_STEP(sign_flow_contract_step, "Contract",  ui_context.line2);
 INFO_STEP(sign_flow_allowance_step, "Allowance",  ui_context.line5);

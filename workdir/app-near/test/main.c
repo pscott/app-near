@@ -38,7 +38,7 @@ static void print_ui() {
     printf("%s\n", ui_context.line1);
     printf("%s\n", ui_context.line2);
     printf("%s\n", ui_context.line3);
-    printf("%s\n", ui_context.line4);
+    printf("%s\n", ui_context.long_line);
     printf("%s\n", ui_context.line5);
     printf("%s\n", ui_context.amount);
 }
@@ -52,7 +52,7 @@ static char *test_parse_transfer_1()
     mu_assert("parses receiver", strcmp(ui_context.line2, "vg") == 0);
     mu_assert("parses signer", strcmp(ui_context.line3, "test-connect-ledger.test") == 0);
     mu_assert("parses amount", strcmp(ui_context.amount, "0.002") == 0);
-    mu_assert("line 4 empty", strcmp(ui_context.line4, "") == 0);
+    mu_assert("line 4 empty", strcmp(ui_context.long_line, "") == 0);
     mu_assert("line 5 empty", strcmp(ui_context.line5, "") == 0);
     mu_assert("uses transfer flow", active_flow == SIGN_FLOW_TRANSFER);
     return 0;
@@ -67,7 +67,7 @@ static char *test_parse_transfer_2()
     mu_assert("parses receiver", strcmp(ui_context.line2, "vg") == 0);
     mu_assert("parses signer", strcmp(ui_context.line3, "test-pr-517-ledger.test") == 0);
     mu_assert("parses amount", strcmp(ui_context.amount, "1") == 0);
-    mu_assert("line 4 empty", strcmp(ui_context.line4, "") == 0);
+    mu_assert("line 4 empty", strcmp(ui_context.long_line, "") == 0);
     mu_assert("line 5 empty", strcmp(ui_context.line5, "") == 0);
     mu_assert("uses transfer flow", active_flow == SIGN_FLOW_TRANSFER);
     return 0;
@@ -82,7 +82,7 @@ static char *test_parse_function_call()
     mu_assert("parses receiver", strcmp(ui_context.line2, "receiver.here") == 0);
     mu_assert("parses signer", strcmp(ui_context.line3, "vg") == 0);
     mu_assert("empty amount", strcmp(ui_context.amount, "") == 0);
-    mu_assert("shows JSON args", strcmp(ui_context.line4, "{\"args\":\"here\"}") == 0);
+    mu_assert("shows JSON args", strcmp(ui_context.long_line, "{\"args\":\"here\"}") == 0);
     mu_assert("parses deposit", strcmp(ui_context.line5, "10") == 0);
     mu_assert("uses function call flow", active_flow == SIGN_FLOW_FUNCTION_CALL);
     return 0;
@@ -98,7 +98,7 @@ static char *test_parse_multiple_actions()
     mu_assert("parses signer", strcmp(ui_context.line3, "vg") == 0);
     // TODO: Show total amount?
     mu_assert("parses amount", strcmp(ui_context.amount, "") == 0);
-    mu_assert("line 4 empty", strcmp(ui_context.line4, "") == 0);
+    mu_assert("line 4 empty", strcmp(ui_context.long_line, "") == 0);
     mu_assert("line 5 empty", strcmp(ui_context.line5, "") == 0);
     mu_assert("uses generic flow", active_flow == SIGN_FLOW_GENERIC);
     return 0;
