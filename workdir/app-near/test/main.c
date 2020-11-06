@@ -22,8 +22,8 @@ static const char FUNCTION_CALL_TRANSACTION_HEX[] = "02000000766700dc9f5db36de8b
 static const char CREATE_ACC_TRANSACTION_HEX[] = "1000000072616e646f6d5f616363312e6e65617200fec7bcd20067927cfab115c72f77c9975b4157e665a0ba3aba382ec03986297901000000000000001000000072616e646f6d5f616363322e6e6561720fa473fd26901df296be6adc4cc4df34d040efa2435224b6986910e630c2fef60100000000";
 static const char DEPLOY_CONTRACT_TRANSACTION_HEX[] = "1000000072616e646f6d5f616363312e6e65617200fec7bcd20067927cfab115c72f77c9975b4157e665a0ba3aba382ec03986297901000000000000001000000072616e646f6d5f616363322e6e6561720fa473fd26901df296be6adc4cc4df34d040efa2435224b6986910e630c2fef60100000001080000000000000000000000";
 static const char STAKE_TRANSACTION_HEX[] = "1000000072616e646f6d5f616363312e6e65617200fec7bcd20067927cfab115c72f77c9975b4157e665a0ba3aba382ec03986297901000000000000001000000072616e646f6d5f616363322e6e6561720fa473fd26901df296be6adc4cc4df34d040efa2435224b6986910e630c2fef601000000046400000000000000000000000000000000fec7bcd20067927cfab115c72f77c9975b4157e665a0ba3aba382ec039862979";
-static const char ADD_UNLIMITED_KEY_TRANSACTION_HEX[] = "1000000072616e646f6d5f616363312e6e65617200fec7bcd20067927cfab115c72f77c9975b4157e665a0ba3aba382ec03986297901000000000000001000000072616e646f6d5f616363322e6e6561720fa473fd26901df296be6adc4cc4df34d040efa2435224b6986910e630c2fef6010000000500fec7bcd20067927cfab115c72f77c9975b4157e665a0ba3aba382ec039862979000000000000000000001200000072616e646f6d5f72656369657665725f696402000000070000006d6574686f6431070000006d6574686f6432";
-static const char ADD_LIMITED_KEY_TRANSACTION_HEX[] = "1000000072616e646f6d5f616363312e6e65617200fec7bcd20067927cfab115c72f77c9975b4157e665a0ba3aba382ec03986297901000000000000001000000072616e646f6d5f616363322e6e6561720fa473fd26901df296be6adc4cc4df34d040efa2435224b6986910e630c2fef6010000000500fec7bcd20067927cfab115c72f77c9975b4157e665a0ba3aba382ec03986297900000000000000000001809698000000000000000000000000001200000072616e646f6d5f72656369657665725f696402000000070000006d6574686f6431070000006d6574686f6432";
+static const char ADD_LIMITED_KEY_TRANSACTION_HEX[] = "1000000072616e646f6d5f616363312e6e65617200fec7bcd20067927cfab115c72f77c9975b4157e665a0ba3aba382ec03986297901000000000000001000000072616e646f6d5f616363322e6e6561720fa473fd26901df296be6adc4cc4df34d040efa2435224b6986910e630c2fef6010000000500fec7bcd20067927cfab115c72f77c9975b4157e665a0ba3aba382ec03986297900000000000000000001809698000000000000000000000000001700000072616e646f6d5f72656369657665725f69642e6e65617202000000070000006d6574686f6431070000006d6574686f6432";
+static const char ADD_UNLIMITED_KEY_TRANSACTION_HEX[] = "1000000072616e646f6d5f616363312e6e65617200fec7bcd20067927cfab115c72f77c9975b4157e665a0ba3aba382ec03986297901000000000000001000000072616e646f6d5f616363322e6e6561720fa473fd26901df296be6adc4cc4df34d040efa2435224b6986910e630c2fef6010000000500fec7bcd20067927cfab115c72f77c9975b4157e665a0ba3aba382ec039862979000000000000000000001700000072616e646f6d5f72656369657665725f69642e6e65617202000000070000006d6574686f6431070000006d6574686f6432";
 static const char DELETE_KEY_TRANSACTION_HEX[] = "1000000072616e646f6d5f616363312e6e65617200fec7bcd20067927cfab115c72f77c9975b4157e665a0ba3aba382ec03986297901000000000000001000000072616e646f6d5f616363322e6e6561720fa473fd26901df296be6adc4cc4df34d040efa2435224b6986910e630c2fef6010000000600fec7bcd20067927cfab115c72f77c9975b4157e665a0ba3aba382ec039862979";
 static const char DELETE_ACC_TRANSACTION_HEX[] = "1000000072616e646f6d5f616363312e6e65617200fec7bcd20067927cfab115c72f77c9975b4157e665a0ba3aba382ec03986297901000000000000001000000072616e646f6d5f616363322e6e6561720fa473fd26901df296be6adc4cc4df34d040efa2435224b6986910e630c2fef60100000007110000006f746865724163636f756e742e6e656172";
 static const char MULTIPLE_ACCTIONS_TRANSACTION_HEX[] = "02000000766700dc9f5db36de8b6b403cf579db5425229175dacf5d1c7f10f1a685cbd7cca827e55000000000000000d00000072656365697665722e68657265e2f0bc3a1a2e946a6e7b33e645d3aeb7146f1331d1f9e4c8fc7c1970f063925602000000020b0000006d6574686f645f6e616d650f0000007b2261726773223a2268657265227d00008a5d784563010000004a480114169545080000000000030100000000000000000000000000000000f9a87dae39c9f8bcf0f34ebca57b047e2921947ab605ac6b9468083b1ef81f6884c5c0df20c5c7e8faf1204743a8aa7bf348711afb5c04f171991f44fd6ddf03";
@@ -114,11 +114,10 @@ static char *test_parse_deploy_contract()
 {
     tmp_ctx.signing_context.buffer_used = PARSE_HEX(tmp_ctx.signing_context.buffer, DEPLOY_CONTRACT_TRANSACTION_HEX);
     int active_flow = parse_transaction();
-    //TODO: change messages
     mu_assert("parses action", strcmp(ui_context.line1, "deploy contract") == 0);
     mu_assert("parses receiver", strcmp(ui_context.line2, "random_acc2.near") == 0);
     mu_assert("parses signer", strcmp(ui_context.line3, "random_acc1.near") == 0);
-    mu_assert("parses amount", strcmp(ui_context.amount, "") == 0);
+    mu_assert("amount empty", strcmp(ui_context.amount, "") == 0);
     mu_assert("line 4 empty", strcmp(ui_context.long_line, "") == 0);
     mu_assert("line 5 empty", strcmp(ui_context.line5, "") == 0);
     mu_assert("uses transfer flow", active_flow == SIGN_FLOW_GENERIC);
@@ -128,11 +127,10 @@ static char *test_parse_stake()
 {
     tmp_ctx.signing_context.buffer_used = PARSE_HEX(tmp_ctx.signing_context.buffer, STAKE_TRANSACTION_HEX);
     int active_flow = parse_transaction();
-    //TODO: change messages
     mu_assert("parses action", strcmp(ui_context.line1, "stake") == 0);
     mu_assert("parses receiver", strcmp(ui_context.line2, "random_acc2.near") == 0);
     mu_assert("parses signer", strcmp(ui_context.line3, "random_acc1.near") == 0);
-    mu_assert("parses amount", strcmp(ui_context.amount, "") == 0);
+    mu_assert("amount empty", strcmp(ui_context.amount, "") == 0);
     mu_assert("line 4 empty", strcmp(ui_context.long_line, "") == 0);
     mu_assert("line 5 empty", strcmp(ui_context.line5, "") == 0);
     mu_assert("uses transfer flow", active_flow == SIGN_FLOW_GENERIC);
@@ -142,13 +140,12 @@ static char *test_parse_add_limited_key()
 {
     tmp_ctx.signing_context.buffer_used = PARSE_HEX(tmp_ctx.signing_context.buffer, ADD_LIMITED_KEY_TRANSACTION_HEX);
     int active_flow = parse_transaction();
-    //TODO: change messages
     mu_assert("parses action", strcmp(ui_context.line1, "add key") == 0);
-    mu_assert("parses receiver", strcmp(ui_context.line2, "random_reciever_id") == 0);
+    mu_assert("parses receiver", strcmp(ui_context.line2, "random_reciever_id.near") == 0);
     mu_assert("parses signer", strcmp(ui_context.line3, "random_acc1.near") == 0);
-    mu_assert("parses amount", strcmp(ui_context.amount, "") == 0);
+    mu_assert("amount empty", strcmp(ui_context.amount, "") == 0);
     mu_assert("line 4 empty", strcmp(ui_context.long_line, "") == 0);
-    mu_assert("line 5 empty", strcmp(ui_context.line5, "0.00000000000000001") == 0);
+    mu_assert("parces limitation", strcmp(ui_context.line5, "0.00000000000000001") == 0);
     mu_assert("uses transfer flow", active_flow == SIGN_FLOW_ADD_FUNCTION_CALL_KEY);
 }
 
@@ -156,13 +153,12 @@ static char *test_parse_add_unlimited_key()
 {
     tmp_ctx.signing_context.buffer_used = PARSE_HEX(tmp_ctx.signing_context.buffer, ADD_UNLIMITED_KEY_TRANSACTION_HEX);
     int active_flow = parse_transaction();
-    //TODO: change messages
     mu_assert("parses action", strcmp(ui_context.line1, "add key") == 0);
-    mu_assert("parses receiver", strcmp(ui_context.line2, "random_reciever_id") == 0);
+    mu_assert("parses receiver", strcmp(ui_context.line2, "random_reciever_id.near") == 0);
     mu_assert("parses signer", strcmp(ui_context.line3, "random_acc1.near") == 0);
-    mu_assert("parses amount", strcmp(ui_context.amount, "") == 0);
+    mu_assert("amount empty", strcmp(ui_context.amount, "") == 0);
     mu_assert("line 4 empty", strcmp(ui_context.long_line, "") == 0);
-    mu_assert("line 5 empty", strcmp(ui_context.line5, "Unlimited") == 0);
+    mu_assert("parces Unlimited", strcmp(ui_context.line5, "Unlimited") == 0);
     mu_assert("uses transfer flow", active_flow == SIGN_FLOW_ADD_FUNCTION_CALL_KEY);
 }
 
@@ -170,11 +166,10 @@ static char *test_parse_delete_key()
 {
     tmp_ctx.signing_context.buffer_used = PARSE_HEX(tmp_ctx.signing_context.buffer, DELETE_KEY_TRANSACTION_HEX);
     int active_flow = parse_transaction();
-    //TODO: change messages
     mu_assert("parses action", strcmp(ui_context.line1, "delete key") == 0);
     mu_assert("parses receiver", strcmp(ui_context.line2, "random_acc2.near") == 0);
     mu_assert("parses signer", strcmp(ui_context.line3, "random_acc1.near") == 0);
-    mu_assert("parses amount", strcmp(ui_context.amount, "") == 0);
+    mu_assert("empty amount", strcmp(ui_context.amount, "") == 0);
     mu_assert("line 4 empty", strcmp(ui_context.long_line, "") == 0);
     mu_assert("line 5 empty", strcmp(ui_context.line5, "") == 0);
     mu_assert("uses transfer flow", active_flow == SIGN_FLOW_GENERIC);
@@ -184,11 +179,10 @@ static char *test_parse_delete_account()
 {
     tmp_ctx.signing_context.buffer_used = PARSE_HEX(tmp_ctx.signing_context.buffer, DELETE_ACC_TRANSACTION_HEX);
     int active_flow = parse_transaction();
-    //TODO: change messages
     mu_assert("parses action", strcmp(ui_context.line1, "delete account") == 0);
     mu_assert("parses receiver", strcmp(ui_context.line2, "random_acc2.near") == 0);
     mu_assert("parses signer", strcmp(ui_context.line3, "random_acc1.near") == 0);
-    mu_assert("parses amount", strcmp(ui_context.amount, "") == 0);
+    mu_assert("empty amount", strcmp(ui_context.amount, "") == 0);
     mu_assert("line 4 empty", strcmp(ui_context.long_line, "") == 0);
     mu_assert("line 5 empty", strcmp(ui_context.line5, "") == 0);
     mu_assert("uses transfer flow", active_flow == SIGN_FLOW_GENERIC);
