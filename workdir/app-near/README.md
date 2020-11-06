@@ -43,4 +43,4 @@ python test_example.py --account_number 12345
 ```
 
 ## Documentation
-This follows the specification available in the [`api.asc`](https://github.com/LedgerHQ/app-near/blob/master/doc/api.asc).
+This follows the specification available in the [`api.asc`](https://github.com/LedgerHQ/app-near/blob/master/workdir/app-near/doc/api.asc).
