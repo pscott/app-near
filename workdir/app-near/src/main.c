@@ -97,14 +97,19 @@ uint32_t set_result_sign() {
 
     public_key_le_to_be(&public_key);
 
-    uint8_t signature[64];
-    near_message_sign(&private_key, public_key.W, (unsigned char *) tmp_ctx.signing_context.buffer, tmp_ctx.signing_context.buffer_used, signature);
+    BEGIN_TRY {
+        TRY {
+            uint8_t signature[64];
+            near_message_sign(&private_key, public_key.W, (unsigned char *)tmp_ctx.signing_context.buffer, tmp_ctx.signing_context.buffer_used, signature);
 
-    os_memmove((char *) G_io_apdu_buffer, signature, sizeof(signature));
-
-    // reset all private stuff
-    os_memset(&private_key, 0, sizeof(cx_ecfp_private_key_t));
-    os_memset(&public_key, 0, sizeof(cx_ecfp_public_key_t));
+            os_memmove((char *)G_io_apdu_buffer, signature, sizeof(signature));
+        } FINALLY {
+            // reset all private stuff
+            os_memset(&private_key, 0, sizeof(cx_ecfp_private_key_t));
+            os_memset(&public_key, 0, sizeof(cx_ecfp_public_key_t));
+        }
+    }
+    END_TRY;
 
     return 64;
 }
@@ -134,21 +139,8 @@ void handle_apdu(volatile unsigned int *flags, volatile unsigned int *tx, volati
                     // If not fail.  Don't want to buffer overrun or anything.
                     THROW(SW_CONDITIONS_NOT_SATISFIED);
                 }
-                if ((G_io_apdu_buffer[2] != P1_MORE) &&
-                    (G_io_apdu_buffer[2] != P1_LAST)) {
-                    THROW(SW_INCORRECT_P1_P2);
-                }
 
-                if (G_io_apdu_buffer[2] == P1_LAST) {
-                    tmp_ctx.signing_context.network_byte = G_io_apdu_buffer[3];
-                    add_chunk_data();
-                    menu_sign_init();
-                    *flags |= IO_ASYNCH_REPLY;
-                } else {
-                    add_chunk_data();
-                    THROW(SW_OK);
-                }
-
+                handle_sign_transaction(G_io_apdu_buffer[OFFSET_P1], G_io_apdu_buffer[OFFSET_P2], G_io_apdu_buffer + OFFSET_CDATA, G_io_apdu_buffer[OFFSET_LC], flags, tx);
             } break;
 
             case INS_GET_PUBLIC_KEY: {
@@ -222,7 +214,6 @@ void app_main(void) {
     // APDU injection faults.
     for (;;) {
         volatile unsigned short sw = 0;
-
         BEGIN_TRY {
             TRY {
                 rx = tx;
